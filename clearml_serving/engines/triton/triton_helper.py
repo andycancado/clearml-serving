@@ -255,7 +255,7 @@ class TritonHelper(object):
         for k, v in self.args.items():
             if not v or not str(k).startswith('t_'):
                 continue
-            cmd.append('--{}={}'.format(k, v))
+            cmd.append('--{}={}'.format(k[2:].replace('_', '-'), v))
 
         print('Starting server: {}'.format(cmd))
         try:
@@ -505,7 +505,7 @@ def main():
         if args_var in args.__dict__:
             # casting
             t = type(getattr(args, args_var, None))
-            setattr(args, args_var, type(t)(v) if t is not None else v)
+            setattr(args, args_var, v if t is not None else v)
 
     # noinspection PyProtectedMember
     serving_task = ModelRequestProcessor._get_control_plane_task(task_id=args.inference_task_id)
