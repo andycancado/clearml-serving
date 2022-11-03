@@ -327,7 +327,7 @@ class TritonPreprocessRequest(BasePreprocessRequest):
             grpc_stub = self._grpc_stub.get(tid)
         else:
             try:
-                channel_opt = [('grpc.max_send_message_length', 8 * 1024 * 1024), ('grpc.max_receive_message_length', 8 * 1024 * 1024)]
+                channel_opt = [('grpc.max_send_message_length', 8 *  8 * 1024 * 1024), ('grpc.max_receive_message_length',  8 * 8 * 1024 * 1024)]
                 channel = self._ext_grpc.aio.insecure_channel(triton_server_address, options=channel_opt)
                 grpc_stub = self._ext_service_pb2_grpc.GRPCInferenceServiceStub(channel)
                 self._grpc_stub[tid] = grpc_stub
