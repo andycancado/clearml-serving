@@ -324,29 +324,15 @@ class TritonPreprocessRequest(BasePreprocessRequest):
             raise ValueError("External Triton gRPC server is not configured!")
 
         tid = threading.get_ident()
-        if self._grpc_stub.get(tid):
-            grpc_stub = self._grpc_stub.get(tid)
-        else:
-            channel_opt = []
-            for k, v in os.environ.items():
-                if str(k).startswith(self._grpc_env_conf_prefix):
-                    try:
-                        v = int(v)
-                    except:  # noqa
-                        try:
-                            v = float(v)
-                        except:  # noqa
-                            pass
-                    channel_opt.append(('grpc.{}'.format(k[len(self._grpc_env_conf_prefix):]), v))
-
-            try:
-                #TODO: remove this hot fix after update branch
-                channel_opt = [('grpc.max_send_message_length', 8 *  8 * 1024 * 1024), ('grpc.max_receive_message_length',  8 * 8 * 1024 * 1024)]
-                channel = self._ext_grpc.aio.insecure_channel(triton_server_address, options=channel_opt or None)
-                grpc_stub = self._ext_service_pb2_grpc.GRPCInferenceServiceStub(channel)
-                self._grpc_stub[tid] = grpc_stub
-            except Exception as ex:
-                raise ValueError("External Triton gRPC server misconfigured [{}]: {}".format(triton_server_address, ex))
+        
+        try:
+            #TODO: remove this hot fix after update branch
+            channel_opt=dict([('grpc.max_send_message_length', 512 * 1024 * 1024), ('grpc.max_receive_message_length', 512 * 1024 * 1024)]))
+            channel = self._ext_grpc.aio.insecure_channel(triton_server_address, options=channel_opt or None)
+            grpc_stub = self._ext_service_pb2_grpc.GRPCInferenceServiceStub(channel)
+            self._grpc_stub[tid] = grpc_stub
+        except Exception as ex:
+            raise ValueError("External Triton gRPC server misconfigured [{}]: {}".format(triton_server_address, ex))
 
         use_compression = self._server_config.get("triton_grpc_compression", self._default_grpc_compression)
 
