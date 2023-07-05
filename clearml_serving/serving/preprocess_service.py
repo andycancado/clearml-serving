@@ -340,6 +340,8 @@ class TritonPreprocessRequest(BasePreprocessRequest):
                     channel_opt.append(('grpc.{}'.format(k[len(self._grpc_env_conf_prefix):]), v))
 
             try:
+                #TODO: remove this hot fix after update branch
+                channel_opt = [('grpc.max_send_message_length', 8 *  8 * 1024 * 1024), ('grpc.max_receive_message_length',  8 * 8 * 1024 * 1024)]
                 channel = self._ext_grpc.aio.insecure_channel(triton_server_address, options=channel_opt or None)
                 grpc_stub = self._ext_service_pb2_grpc.GRPCInferenceServiceStub(channel)
                 self._grpc_stub[tid] = grpc_stub
